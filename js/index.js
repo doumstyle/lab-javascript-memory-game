@@ -25,9 +25,57 @@ const cards = [
   { name: 'thor', img: 'thor.jpg' }
 ];
 
+// Constants
 const memoryGame = new MemoryGame(cards);
+const cardElement = document.querySelector('.card');
+const pairsClickedElement = document.querySelector('#pairs-clicked');
+const pairsGuessedElement = document.querySelector('#pairs-guessed');
+const endgame = document.querySelector('.endgame');
+
+let cardFlippedTimeout = 0;
+
+// Helpers functions
+const updateScore = () => {
+	pairsClickedElement.textContent = memoryGame.pairsClicked;
+	pairsGuessedElement.textContent = memoryGame.pairsGuessed;
+}
+
+const endgameMsg = () => {
+	endgame.textContent = "Congratulations Avenger! You Win!!";
+}
+
+const block = (card) => {
+	card.classList.toggle('blocked');
+}
+
+const flip = (card) => {
+	card.classList.toggle('turned');
+}
+
+const checkPairing = () => {
+	const card1Name = memoryGame.pickedCards[0].getAttribute('data-card-name');
+	const card2Name = memoryGame.pickedCards[1].getAttribute('data-card-name');
+
+	if (memoryGame.checkIfPair(card1Name, card2Name)) {
+		block(memoryGame.pickedCards[0]);
+		block(memoryGame.pickedCards[1]);
+		
+		if (memoryGame.checkIfFinished()) {
+			endgameMsg();
+		}
+	} else {
+		flip(memoryGame.pickedCards[0]);
+		flip(memoryGame.pickedCards[1]);
+	}
+
+	memoryGame.pickedCards = [];
+	updateScore();
+	clearTimeout(cardFlippedTimeout);
+
+}
 
 window.addEventListener('load', (event) => {
+	memoryGame.shuffleCards();
   let html = '';
   memoryGame.cards.forEach((pic) => {
     html += `
@@ -44,8 +92,14 @@ window.addEventListener('load', (event) => {
   // Bind the click event of each element to a function
   document.querySelectorAll('.card').forEach((card) => {
     card.addEventListener('click', () => {
-      // TODO: write some code here
-      console.log(`Card clicked: ${card}`);
+      flip(card);
+			memoryGame.pickedCards.push(card);
+			
+			if (memoryGame.pickedCards.length === 2) {
+				cardFlippedTimeout = setTimeout(() => {
+					checkPairing();
+				}, 1000)
+			}
     });
   });
 });

@@ -1,9 +1,9 @@
 class MemoryGame {
-  constructor(cards) {
+  constructor(cards, pickedCards = [], pairsClicked = 0, pairsGuessed = 0) {
     this.cards = cards;
-    this.pickedCards = [];
-    this.pairsClicked = 0;
-    this.pairsGuessed = 0;
+    this.pickedCards = pickedCards;
+    this.pairsClicked = pairsClicked;
+    this.pairsGuessed = pairsGuessed;
   }
 
   shuffleCards() {
@@ -36,7 +36,7 @@ class MemoryGame {
   }
 
   checkIfFinished() {
-   if (this.pairsGuessed === 8) {
+   if (this.pairsGuessed === 12) {
      return true;
    } else {
      return false;
